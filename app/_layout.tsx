@@ -1,24 +1,53 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+// app/_layout.tsx
+import { Stack } from "expo-router";
+import { useEffect } from "react";
+import * as SplashScreen from "expo-splash-screen";
+import "./global.css";
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import {
+  useFonts,
+  Manrope_400Regular,
+  Manrope_700Bold,
+} from "@expo-google-fonts/manrope";
+import {
+  Dosis_400Regular,
+  Dosis_700Bold,
+} from "@expo-google-fonts/dosis";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { StatusBar } from "react-native";
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  // ✅ Load fonts
+  const [fontsLoaded] = useFonts({
+    Manrope_400Regular,
+    Manrope_700Bold,
+    Dosis_400Regular,
+    Dosis_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) SplashScreen.hideAsync();
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null; // Wait until fonts load before rendering
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+    <SafeAreaProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="(tabs)" />
+        {/* Auth screens show first */}
+        <Stack.Screen name="(auth)" />
+
+        {/* Tabs (home) screens */}
+        
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+      <StatusBar />
+    </SafeAreaProvider>
   );
 }
